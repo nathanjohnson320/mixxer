@@ -12,6 +12,10 @@ defmodule Mix.Tasks.Deps.Add do
 
   --version   A specific version to add, will error if it does not exist in hex.
 
+  --only      Only add this dependency in these environments
+
+  --override  Overrides any other version in other dependencies
+
   """
 
   use Mix.Task
@@ -24,10 +28,12 @@ defmodule Mix.Tasks.Deps.Add do
   @shortdoc "adds a dependency"
   def run(args) do
     {params, _unmatched, _invalid} =
-      OptionParser.parse(args, strict: [version: :string, package: :string])
+      OptionParser.parse(args,
+        strict: [version: :string, package: :string, only: :string, override: :boolean]
+      )
 
     with package when not is_nil(package) <- params[:package],
-         {:ok, version} <- get_version(params),
+         {:ok, version} <- get_version(package, params[:version]),
          {:ok, mixfile} <-
            File.read!(@file_path)
            |> Code.string_to_quoted(),
@@ -37,7 +43,9 @@ defmodule Mix.Tasks.Deps.Add do
                {node, true}
 
              {:do, deps}, true ->
-               {{:do, [{String.to_atom(package), version} | deps]}, false}
+               dep = build_dep(package, version, params)
+               Logger.info("Added #{dep |> Macro.to_string()}")
+               {{:do, [dep | deps]}, false}
 
              node, acc ->
                {node, acc}
@@ -46,7 +54,6 @@ defmodule Mix.Tasks.Deps.Add do
            updated
            |> Macro.to_string()
            |> Code.format_string!() do
-      Logger.info("Added #{inspect({String.to_atom(package), version})}")
       File.write!(@file_path, formatted)
     else
       nil ->
@@ -60,7 +67,7 @@ defmodule Mix.Tasks.Deps.Add do
     end
   end
 
-  defp get_version(package: package, version: search_version) do
+  defp get_version(package, search_version) when not is_nil(search_version) do
     {:ok, {200, _headers, %{"releases" => releases}}} = :hex_api_package.get(@config, package)
     version = Enum.find(releases, &(Map.get(&1, "version") == search_version))
 
@@ -71,10 +78,27 @@ defmodule Mix.Tasks.Deps.Add do
     end
   end
 
-  defp get_version(package: package) do
+  defp get_version(package, _version) do
     {:ok, {200, _headers, %{"releases" => releases}}} = :hex_api_package.get(@config, package)
     %{"version" => version} = List.first(releases)
 
     {:ok, "~> #{version}"}
+  end
+
+  defp build_dep(package, version, params) do
+    extra_args =
+      [
+        if params[:override] do
+          {:override, true}
+        end,
+        if params[:only] do
+          {:only, params[:only]}
+        end
+      ]
+      |> Enum.filter(&(not is_nil(&1)))
+
+    quote do
+      {unquote(String.to_atom(package)), unquote(version), unquote(extra_args)}
+    end
   end
 end
