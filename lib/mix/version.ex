@@ -4,13 +4,13 @@ defmodule Mix.Tasks.Version do
 
   ## Usage
 
-  $ mix version --major
+  $ mix version major
 
   ## Parameters
 
-  --patch   Bumps last part of semver
-  --minor   Bumps middle part of semver
-  --major   Bumps first part of semver
+  patch   Bumps last part of semver
+  minor   Bumps middle part of semver
+  major   Bumps first part of semver
 
   """
 
@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Version do
 
   @shortdoc "Updates version in mix.exs by given semver and adds git tag"
   def run(args) do
-    {params, _unmatched, _invalid} =
+    {_params, [params], _invalid} =
       OptionParser.parse(args,
         strict: [major: :boolean, minor: :boolean, patch: :boolean]
       )
@@ -55,9 +55,9 @@ defmodule Mix.Tasks.Version do
     end
   end
 
-  defp bump_version!(current, major: true), do: %{current | major: current.major + 1}
-  defp bump_version!(current, minor: true), do: %{current | minor: current.minor + 1}
-  defp bump_version!(current, patch: true), do: %{current | patch: current.patch + 1}
+  defp bump_version!(current, "major"), do: %{current | major: current.major + 1}
+  defp bump_version!(current, "minor"), do: %{current | minor: current.minor + 1}
+  defp bump_version!(current, "patch"), do: %{current | patch: current.patch + 1}
 
   defp bump_version!(_curent, _params) do
     Logger.error("usage: mix version --minor")
@@ -66,8 +66,8 @@ defmodule Mix.Tasks.Version do
 
   defp git_tag(version) do
     version = "v#{version}"
-    System.cmd("git", ["add", "-u"])
-    System.cmd("git", ["commit", "-m", version])
-    System.cmd("git", ["tag", version])
+    System.cmd("git", ["add", "-u"]) |> IO.inspect()
+    System.cmd("git", ["commit", "-m", version]) |> IO.inspect()
+    System.cmd("git", ["tag", version]) |> IO.inspect()
   end
 end
