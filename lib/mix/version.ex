@@ -30,22 +30,23 @@ defmodule Mix.Tasks.Version do
     with {:ok, mixfile} <-
            File.read!(@file_path)
            |> Code.string_to_quoted(),
-         updated <-
-           Macro.prewalk(mixfile, fn
-             {:version, current} ->
+         {updated, new_version} <-
+           Macro.prewalk(mixfile, "", fn
+             {:version, current}, _acc ->
                current = Version.parse!(current)
                new = bump_version!(current, params)
-               git_tag(new)
-               {:version, new |> to_string()}
 
-             node ->
-               node
+               {{:version, new |> to_string()}, new}
+
+             node, acc ->
+               {node, acc}
            end),
          formatted <-
            updated
            |> Macro.to_string()
            |> Code.format_string!() do
       File.write!(@file_path, formatted)
+      git_tag(new_version)
     else
       nil ->
         Logger.error("usage: mix version --minor")
