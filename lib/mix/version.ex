@@ -66,8 +66,8 @@ defmodule Mix.Tasks.Version do
 
   defp git_tag(version) do
     version = "v#{version}"
-    {"", 0} = System.cmd("git", ["add", "-u"])
-    {"", 0} = System.cmd("git", ["commit", "-m", version])
-    {"", 0} = System.cmd("git", ["tag", version])
+    {_, 0} = System.cmd("git", ["add", "-u"])
+    {_, 0} = System.cmd("git", ["commit", "-m", version])
+    {_, 0} = System.cmd("git", ["tag", version])
   end
 end
