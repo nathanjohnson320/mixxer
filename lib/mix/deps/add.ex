@@ -16,6 +16,8 @@ defmodule Mix.Tasks.Deps.Add do
 
   --override  Overrides any other version in other dependencies
 
+  --runtime   Is this package runtime only
+
   """
 
   use Mix.Task
@@ -29,7 +31,13 @@ defmodule Mix.Tasks.Deps.Add do
   def run(args) do
     {params, _unmatched, _invalid} =
       OptionParser.parse(args,
-        strict: [version: :string, package: :string, only: :string, override: :boolean]
+        strict: [
+          version: :string,
+          package: :string,
+          only: :string,
+          override: :boolean,
+          runtime: :boolean
+        ]
       )
 
     with package when not is_nil(package) <- params[:package],
@@ -39,8 +47,11 @@ defmodule Mix.Tasks.Deps.Add do
            |> Code.string_to_quoted(),
          {updated, _} <-
            Macro.prewalk(mixfile, false, fn
-             {:deps, _, nil} = node, false ->
+             {:deps, _, []} = node, false ->
                {node, true}
+
+             {:application, _, []} = node, true ->
+               {node, false}
 
              {:do, deps}, true ->
                dep = build_dep(package, version, params)
@@ -93,6 +104,9 @@ defmodule Mix.Tasks.Deps.Add do
         end,
         if params[:only] do
           {:only, params[:only] |> String.to_atom()}
+        end,
+        if not is_nil(params[:runtime]) and not params[:runtime] do
+          {:runtime, false}
         end
       ]
       |> Enum.filter(&(not is_nil(&1)))

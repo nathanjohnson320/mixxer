@@ -1,21 +1,29 @@
 defmodule(Mixxer.MixProject) do
   use(Mix.Project)
 
-  def(project) do
+  def(project()) do
     [
       app: :mixxer,
       version: "1.0.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
-  def(application) do
+  def(application()) do
     [extra_applications: [:logger]]
   end
 
-  defp(deps) do
-    [hex_core: "~> 0.6.9"]
+  defp(deps()) do
+    [
+      {:ex_doc, "~> 0.22.1", [only: :dev, runtime: false]},
+      {:hex_core, "~> 0.6.9"}
+    ]
+  end
+
+  defp(package()) do
+    [licenses: ["MIT"], links: %{"GitHub" => "https://github.com/nathanjohnson320/mixxer"}]
   end
 end
