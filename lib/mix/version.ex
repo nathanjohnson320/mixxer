@@ -18,8 +18,6 @@ defmodule Mix.Tasks.Version do
 
   require Logger
 
-  @file_path Path.expand("./mix.exs")
-
   @shortdoc "Updates version in mix.exs by given semver and adds git tag"
   def run(args) do
     {_params, [params], _invalid} =
@@ -28,7 +26,7 @@ defmodule Mix.Tasks.Version do
       )
 
     with {:ok, mixfile} <-
-           File.read!(@file_path)
+           File.read!(file_path())
            |> Code.string_to_quoted(),
          {updated, new_version} <-
            Macro.prewalk(mixfile, "", fn
@@ -45,7 +43,7 @@ defmodule Mix.Tasks.Version do
            updated
            |> Macro.to_string()
            |> Code.format_string!() do
-      File.write!(@file_path, formatted)
+      File.write!(file_path(), formatted)
       git_tag(new_version)
       Logger.info("Updated and tagged version #{new_version}")
     else
@@ -73,5 +71,9 @@ defmodule Mix.Tasks.Version do
     {_, 0} = System.cmd("git", ["add", "."])
     {_, 0} = System.cmd("git", ["commit", "-m", version])
     {_, 0} = System.cmd("git", ["tag", version])
+  end
+
+  defp file_path() do
+    Path.expand("#{File.cwd!()}/mix.exs")
   end
 end

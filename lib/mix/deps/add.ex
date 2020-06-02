@@ -25,7 +25,6 @@ defmodule Mix.Tasks.Deps.Add do
   require Logger
 
   @config :hex_core.default_config()
-  @file_path Path.expand("./mix.exs")
 
   @shortdoc "adds a dependency"
   def run(args) do
@@ -43,7 +42,7 @@ defmodule Mix.Tasks.Deps.Add do
     with package when not is_nil(package) <- params[:package],
          {:ok, version} <- get_version(package, params[:version]),
          {:ok, mixfile} <-
-           File.read!(@file_path)
+           File.read!(file_path())
            |> Code.string_to_quoted(),
          {updated, _} <-
            Macro.prewalk(mixfile, false, fn
@@ -65,7 +64,7 @@ defmodule Mix.Tasks.Deps.Add do
            updated
            |> Macro.to_string()
            |> Code.format_string!() do
-      File.write!(@file_path, formatted)
+      File.write!(file_path(), formatted)
     else
       nil ->
         Logger.error("usage: mix deps.add --package ini")
@@ -114,5 +113,9 @@ defmodule Mix.Tasks.Deps.Add do
     quote do
       {unquote(String.to_atom(package)), unquote(version), unquote(extra_args)}
     end
+  end
+
+  defp file_path() do
+    Path.expand("#{File.cwd!()}/mix.exs")
   end
 end
