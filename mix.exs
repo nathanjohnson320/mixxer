@@ -4,7 +4,9 @@ defmodule(Mixxer.MixProject) do
   def(project()) do
     [
       app: :mixxer,
-      version: "1.0.1",
+      description: description(),
+      source_url: "https://github.com/nathanjohnson320/mixxer",
+      version: "1.0.2",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -22,5 +24,9 @@ defmodule(Mixxer.MixProject) do
 
   defp(package()) do
     [licenses: ["MIT"], links: %{"GitHub" => "https://github.com/nathanjohnson320/mixxer"}]
+  end
+
+  defp(description()) do
+    "Adds two mix tasks for dealing with versioning and adding dependencies found in npm."
   end
 end
