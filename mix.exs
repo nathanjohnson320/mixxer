@@ -6,7 +6,7 @@ defmodule(Mixxer.MixProject) do
       app: :mixxer,
       description: description(),
       source_url: "https://github.com/nathanjohnson320/mixxer",
-      version: "1.0.2",
+      version: "1.0.3",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
