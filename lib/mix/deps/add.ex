@@ -74,7 +74,7 @@ defmodule Mix.Tasks.Deps.Add do
     if is_nil(version) do
       {:error, :no_version, "#{package} version #{version} not found"}
     else
-      {:ok, version}
+      {:ok, version["version"]}
     end
   end
 
@@ -92,7 +92,7 @@ defmodule Mix.Tasks.Deps.Add do
           {:override, true}
         end,
         if params[:only] do
-          {:only, params[:only]}
+          {:only, params[:only] |> String.to_atom()}
         end
       ]
       |> Enum.filter(&(not is_nil(&1)))

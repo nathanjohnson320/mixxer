@@ -1,3 +1,4 @@
 %{
   "hex_core": {:hex, :hex_core, "0.6.9", "da1aea4547b8d399e9c37b469a063ae526c3f60b0b38b21ea7bda14b737f3586", [:rebar3], [], "hexpm", "8ec071f590a5a62a5ec2a08fc397d1597e38d80f2dcb2fdef7fde5f6aaa0d5a6"},
+  "ini": {:hex, :ini, "1.0.0", "96309d2bc3d1d500d1e6413f6a334008284367d2e9886b53a9971987fa7b5ac2", [:mix], [], "hexpm", "7dbb1386d42e487f2533f9f7d03dd33fc87fe75db5d1d86bdb55d0766667810e"},
 }

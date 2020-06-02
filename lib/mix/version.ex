@@ -47,6 +47,7 @@ defmodule Mix.Tasks.Version do
            |> Code.format_string!() do
       File.write!(@file_path, formatted)
       git_tag(new_version)
+      Logger.info("Updated and tagged version #{new_version}")
     else
       nil ->
         Logger.error("usage: mix version --minor")
@@ -56,8 +57,10 @@ defmodule Mix.Tasks.Version do
     end
   end
 
-  defp bump_version!(current, "major"), do: %{current | major: current.major + 1}
-  defp bump_version!(current, "minor"), do: %{current | minor: current.minor + 1}
+  defp bump_version!(current, "major"),
+    do: %{current | major: current.major + 1, minor: 0, patch: 0}
+
+  defp bump_version!(current, "minor"), do: %{current | minor: current.minor + 1, patch: 0}
   defp bump_version!(current, "patch"), do: %{current | patch: current.patch + 1}
 
   defp bump_version!(_curent, _params) do

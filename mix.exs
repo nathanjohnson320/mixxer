@@ -16,6 +16,6 @@ defmodule(Mixxer.MixProject) do
   end
 
   defp(deps) do
-    [hex_core: "~> 0.6.9"]
+    [{:hex_core, "~> 0.6.9"}]
   end
 end
