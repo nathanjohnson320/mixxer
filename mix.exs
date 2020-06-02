@@ -4,7 +4,7 @@ defmodule(Mixxer.MixProject) do
   def(project) do
     [
       app: :mixxer,
-      version: "0.2.2",
+      version: "1.0.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -16,6 +16,6 @@ defmodule(Mixxer.MixProject) do
   end
 
   defp(deps) do
-    [{:hex_core, "~> 0.6.9"}]
+    [hex_core: "~> 0.6.9"]
   end
 end
